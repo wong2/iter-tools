@@ -474,21 +474,21 @@ export declare function zip<T> (...iterables: Array<Iterable<T>>): IterableItera
 
 // Sync Decorators
 interface InterleaveBuffer<T> {
-  take<T> (): T | undefined
+  take (): T | undefined
   canTake (): this is TakableInterleaveBuffer<T>
 }
 
-interface TakableInterleaveBuffer<T> {
-  take<T> (): T
+interface TakableInterleaveBuffer<T> extends InterleaveBuffer<T> {
+  take (): T
 }
 
-export declare function interleaveGenerator<T1> (gen: (canTakeAny: () => InterleaveBuffer<T1> | null, b1: InterleaveBuffer<T1>) => any): (i1: Iterable<T1>) => IterableIterator<T1>
-export declare function interleaveGenerator<T1, T2> (gen: (canTakeAny: () => InterleaveBuffer<T1 | T2> | null, b1: InterleaveBuffer<T1>, b2: InterleaveBuffer<T2>) => any): (i1: Iterable<T1>, i2: Iterable<T2>) => IterableIterator<T1 | T2>
-export declare function interleaveGenerator<T1, T2, T3> (gen: (canTakeAny: () => InterleaveBuffer<T1 | T2 | T3> | null, b1: InterleaveBuffer<T1>, b2: InterleaveBuffer<T2>, b3: InterleaveBuffer<T3>) => any): (i1: Iterable<T1>, i2: Iterable<T2>, i3: Iterable<T3>) => IterableIterator<T1 | T2 | T3>
-export declare function interleaveGenerator<T1, T2, T3, T4> (gen: (canTakeAny: () => InterleaveBuffer<T1 | T2 | T3 | T4> | null, b1: InterleaveBuffer<T1>, b2: InterleaveBuffer<T2>, b3: InterleaveBuffer<T3>, b4: InterleaveBuffer<T4>) => any): (i1: Iterable<T1>, i2: Iterable<T2>, i3: Iterable<T3>, i4: Iterable<T4>) => IterableIterator<T1 | T2 | T3 | T4>
-export declare function interleaveGenerator<T> (
-  gen: (canTakeAny: () => InterleaveBuffer<T> | null, ...buffers: Array<InterleaveBuffer<T>>) => any
-): (...iterables: Array<Iterable<T>>) => IterableIterator<T>
+export declare function interleaveGenerator<T1 = any, R = any> (gen: (canTakeAny: () => InterleaveBuffer<T1> | null, b1: InterleaveBuffer<T1>) => IterableIterator<R>): (i1: Iterable<T1>) => IterableIterator<R>
+export declare function interleaveGenerator<T1 = any, T2 = any, R = any> (gen: (canTakeAny: () => InterleaveBuffer<T1 | T2> | null, b1: InterleaveBuffer<T1>, b2: InterleaveBuffer<T2>) => IterableIterator<R>): (i1: Iterable<T1>, i2: Iterable<T2>) => IterableIterator<R>
+export declare function interleaveGenerator<T1 = any, T2 = any, T3 = any, R = any> (gen: (canTakeAny: () => InterleaveBuffer<T1 | T2 | T3> | null, b1: InterleaveBuffer<T1>, b2: InterleaveBuffer<T2>, b3: InterleaveBuffer<T3>) => IterableIterator<R>): (i1: Iterable<T1>, i2: Iterable<T2>, i3: Iterable<T3>) => IterableIterator<R>
+export declare function interleaveGenerator<T1 = any, T2 = any, T3 = any, T4 = any, R = any> (gen: (canTakeAny: () => InterleaveBuffer<T1 | T2 | T3 | T4> | null, b1: InterleaveBuffer<T1>, b2: InterleaveBuffer<T2>, b3: InterleaveBuffer<T3>, b4: InterleaveBuffer<T4>) => IterableIterator<R>): (i1: Iterable<T1>, i2: Iterable<T2>, i3: Iterable<T3>, i4: Iterable<T4>) => IterableIterator<R>
+export declare function interleaveGenerator<T, R> (
+  gen: (canTakeAny: () => InterleaveBuffer<T> | null, ...buffers: Array<InterleaveBuffer<T>>) => IterableIterator<R>
+): (...iterables: Array<Iterable<T>>) => IterableIterator<R>
 
 // Async
 export declare function asyncBatch<T> (n: number): (iterable: AsyncIterableLike<T>) => AsyncIterableIterator<T>
@@ -792,17 +792,17 @@ export declare function asyncThrottle<T> (n: number, iterable: AsyncIterableLike
 
 // Async Decorators
 interface AsyncInterleaveBuffer<T> {
-  take<T> (): Promise<T>
+  take (): Promise<T>
   canTake (): Promise<boolean>
 }
 
-export declare function asyncInterleaveGenerator<T1> (gen: (canTakeAny: () => Promise<AsyncInterleaveBuffer<T1> | null>, b1: AsyncInterleaveBuffer<T1>) => any): (i1: AsyncIterableLike<T1>) => AsyncIterableIterator<T1>
-export declare function asyncInterleaveGenerator<T1, T2> (gen: (canTakeAny: () => Promise<AsyncInterleaveBuffer<T1 | T2> | null>, b1: AsyncInterleaveBuffer<T1>, b2: AsyncInterleaveBuffer<T2>) => any): (i1: AsyncIterableLike<T1>, i2: AsyncIterableLike<T2>) => AsyncIterableIterator<T1 | T2>
-export declare function asyncInterleaveGenerator<T1, T2, T3> (gen: (canTakeAny: () => Promise<AsyncInterleaveBuffer<T1 | T2 | T3> | null>, b1: AsyncInterleaveBuffer<T1>, b2: AsyncInterleaveBuffer<T2>, b3: AsyncInterleaveBuffer<T3>) => any): (i1: AsyncIterableLike<T1>, i2: AsyncIterableLike<T2>, i3: AsyncIterableLike<T3>) => AsyncIterableIterator<T1 | T2 | T3>
-export declare function asyncInterleaveGenerator<T1, T2, T3, T4> (gen: (canTakeAny: () => Promise<AsyncInterleaveBuffer<T1 | T2 | T3 | T4> | null>, b1: AsyncInterleaveBuffer<T1>, b2: AsyncInterleaveBuffer<T2>, b3: AsyncInterleaveBuffer<T3>, b4: AsyncInterleaveBuffer<T4>) => any): (i1: AsyncIterableLike<T1>, i2: AsyncIterableLike<T2>, i3: AsyncIterableLike<T3>, i4: AsyncIterableLike<T4>) => AsyncIterableIterator<T1 | T2 | T3 | T4>
-export declare function asyncInterleaveGenerator<T> (
-  gen: (canTakeAny: () => Promise<AsyncInterleaveBuffer<T> | null>, ...buffers: Array<AsyncInterleaveBuffer<T>>) => any
-): (...iterables: Array<AsyncIterableLike<T>>) => AsyncIterableIterator<T>
+export declare function asyncInterleaveGenerator<T1 = any, R = any> (gen: (canTakeAny: () => Promise<AsyncInterleaveBuffer<T1> | null>, b1: AsyncInterleaveBuffer<T1>) => AsyncIterableIterator<R>): (i1: AsyncIterableLike<T1>) => AsyncIterableIterator<R>
+export declare function asyncInterleaveGenerator<T1 = any, T2 = any, R = any> (gen: (canTakeAny: () => Promise<AsyncInterleaveBuffer<T1 | T2> | null>, b1: AsyncInterleaveBuffer<T1>, b2: AsyncInterleaveBuffer<T2>) => AsyncIterableIterator<R>): (i1: AsyncIterableLike<T1>, i2: AsyncIterableLike<T2>) => AsyncIterableIterator<R>
+export declare function asyncInterleaveGenerator<T1 = any, T2 = any, T3 = any, R = any> (gen: (canTakeAny: () => Promise<AsyncInterleaveBuffer<T1 | T2 | T3> | null>, b1: AsyncInterleaveBuffer<T1>, b2: AsyncInterleaveBuffer<T2>, b3: AsyncInterleaveBuffer<T3>) => AsyncIterableIterator<R>): (i1: AsyncIterableLike<T1>, i2: AsyncIterableLike<T2>, i3: AsyncIterableLike<T3>) => AsyncIterableIterator<R>
+export declare function asyncInterleaveGenerator<T1 = any, T2 = any, T3 = any, T4 = any, R = any> (gen: (canTakeAny: () => Promise<AsyncInterleaveBuffer<T1 | T2 | T3 | T4> | null>, b1: AsyncInterleaveBuffer<T1>, b2: AsyncInterleaveBuffer<T2>, b3: AsyncInterleaveBuffer<T3>, b4: AsyncInterleaveBuffer<T4>) => AsyncIterableIterator<R>): (i1: AsyncIterableLike<T1>, i2: AsyncIterableLike<T2>, i3: AsyncIterableLike<T3>, i4: AsyncIterableLike<T4>) => AsyncIterableIterator<R>
+export declare function asyncInterleaveGenerator<T, R> (
+  gen: (canTakeAny: () => Promise<AsyncInterleaveBuffer<T> | null>, ...buffers: Array<AsyncInterleaveBuffer<T>>) => AsyncIterableIterator<R>
+): (...iterables: Array<AsyncIterableLike<T>>) => AsyncIterableIterator<R>
 
 // merge helpers
 export declare function mergeByComparison<T> (comparator: (a: T, b: T) => number): MergePickFunc<T>

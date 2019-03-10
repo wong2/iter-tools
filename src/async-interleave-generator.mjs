@@ -27,7 +27,7 @@ export default function interleaveGenerator (generatorFn) {
   return (...iterables) => {
     return (async function * () {
       const buffers = iterables.map(iterable =>
-         new AsyncInterleaveBuffer(ensureAsyncIterable(iterable)[Symbol.asyncIterator]())
+        new AsyncInterleaveBuffer(ensureAsyncIterable(iterable)[Symbol.asyncIterator]())
       )
       const canTakeAny = () => raceTo(Boolean, false, map(async buffer => (await buffer.canTake()) ? buffer : null, buffers))
       try {
