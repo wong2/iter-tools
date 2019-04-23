@@ -73,3 +73,5 @@ function combineFunctionConfig (fn, fnConfig) {
 export const iterableCurry = (fn, config = {}) => {
   return variadicCurryWithValidation(combineFunctionConfig(fn, config))
 }
+
+export const curry = iterableCurry
