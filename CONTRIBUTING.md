@@ -5,6 +5,9 @@ Working on an open source project like this should be a rewarding and instructiv
 
 Most of the contributors are working at this project in their free time. So the first rule is to not expect someone to answer you immediately, just like no one expects you to do the same. We love open sources but everyone has more important commitments (job family etc.)
 
+## Templates
+Some of the sources of this project are created from templates in order to ease the difficulty of maintaining highly similar sync and async versions of the functions.
+
 ## Coding conventions
 This project uses ESLINT with [standard](https://standardjs.com/). Just run ```npm run lint``` to check if your code is ok. Also we use 2 spaces for indentation.
 
