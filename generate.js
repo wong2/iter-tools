@@ -31,8 +31,8 @@ function processPath(basename) {
     configFile: false,
     plugins: [
       babel.createConfigItem(resolveAImportPaths),
-      "babel-plugin-macros",
-      // ['minify-dead-code-elimination', { keepFnName: true, keepFnArgs: true, keepClassName: true }],
+      "macros",
+      ['minify-dead-code-elimination', { keepFnName: true, keepFnArgs: true, keepClassName: true }],
     ],
   }).code;
 

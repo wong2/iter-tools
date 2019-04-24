@@ -65,6 +65,9 @@ function asyncMacro({ references, babel }) {
       reference.remove()
 
       continue;
+    } else if (parentType === "IfStatement") {
+      reference.replaceWith(t.booleanLiteral(!!ASYNC))
+      continue;
     }
 
     if (args.length !== 1) {
