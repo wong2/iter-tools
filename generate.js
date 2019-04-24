@@ -32,6 +32,7 @@ function processPath(basename) {
     plugins: [
       babel.createConfigItem(resolveAImportPaths),
       "macros",
+      // use dead code elimination to clean up if(false) {} and if(true) {}
       ['minify-dead-code-elimination', { keepFnName: true, keepFnArgs: true, keepClassName: true }],
     ],
   }).code;

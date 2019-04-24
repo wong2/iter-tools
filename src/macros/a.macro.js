@@ -4,30 +4,27 @@ const matches = require('./matches')
 const { ASYNC } = process.env
 
 /**
+ * This is a babel macro. To read more about babel macros, take a look at their docs:
+ * https://github.com/kentcdodds/babel-plugin-macros
+ *
  * This macro transforms several common patterns into either sync or async variants.
  * Here is a what it will transform:
  *
- * a(function() {})
- * a(Symbol.iterator)
- * a(anyExpression)
- * a; function fn() {}
- * a; for(const foo of iterable) {}
+ *           SYNC                    TEMPLATE                    ASYNC
+ *                               a(function() {})
+ *       function() {}                 <--->               async function() {}
  *
- * When generating sync sources, the above would become:
+ *                              a(Symbol.iterator)
+ *      Symbol.iterator                <--->              Symbol.asyncIterator
  *
- * function() {}
- * Symbol.iterator
- * anyExpression
- * function fn() {}
- * for(const foo of iterable) {}
+ *                               a(anyExpression)
+ *       anyExpression                 <--->               await anyExpression
  *
- * When generating async sources, you would get:
+ *                             a; function fn() {}
+ *     function fn() {}                <--->              async function fn() {}
  *
- * async function() {}
- * Symbol.asyncIterator
- * await anyExpression
- * async function fn() {}
- * for await(const foo of iterable) {}
+ *                        a; for(const foo of iterable) {}
+ * for(const foo of iterable) {}       <--->       for await(const foo of iterable) {}
  */
 
 const symbolIteratorAst = {
@@ -56,18 +53,25 @@ function asyncMacro ({ references, babel }) {
   const t = babel.types
 
   for (const reference of references.default) {
+
     const { arguments: args, type: parentType } = reference.parent
 
     if (parentType === 'ExpressionStatement') {
+      // a; ...
+
       const { container, node: parentNode } = reference.parentPath
       const loopIdx = container.findIndex(node => node === parentNode) + 1
       const nextStatement = container[loopIdx]
 
       if (matches(loopStatementAst, nextStatement)) {
+        // a; for .. of
+
         if (ASYNC) {
           nextStatement.await = true
         }
       } else if (matches(functionDeclarationAst, nextStatement)) {
+        // a; function foo() {}
+
         if (ASYNC) {
           nextStatement.async = true
         }
@@ -77,37 +81,49 @@ function asyncMacro ({ references, babel }) {
 
       continue
     } else if (parentType === 'IfStatement') {
+      // if (a) { ... }
+
       reference.replaceWith(t.booleanLiteral(!!ASYNC))
       continue
-    }
+    } else if (parentType === 'CallExpression') {
+      // a(...)
 
-    if (args.length !== 1) {
-      throw new Error('The a() macro takes exactly one argument')
-    }
+      const { arguments: args } = reference.parent
 
-    let target = args[0]
-
-    if (matches(symbolIteratorAst, target)) {
-      if (ASYNC) {
-        target.property.name = 'asyncIterator'
-      }
-    } else if (matches(functionExpressionAst, target)) {
-      if (ASYNC) {
-        target.async = true
+      if (args.length !== 1) {
+        throw new Error('The a() macro takes exactly one argument')
       }
 
-      target.type = 'FunctionDeclaration'
+      let target = args[0]
 
-      reference.parentPath.parentPath.replaceWith(target)
+      if (matches(symbolIteratorAst, target)) {
+        // a(Symbol.iterator)
 
-      continue
-    } else {
-      if (ASYNC) {
-        target = t.awaitExpression(target)
+        if (ASYNC) {
+          target.property.name = 'asyncIterator'
+        }
+      } else if (matches(functionExpressionAst, target)) {
+        // a(function() {})
+
+        if (ASYNC) {
+          target.async = true
+        }
+
+        target.type = 'FunctionDeclaration'
+
+        reference.parentPath.parentPath.replaceWith(target)
+
+        continue
+      } else {
+        // a(someExpression)
+
+        if (ASYNC) {
+          target = t.awaitExpression(target)
+        }
       }
-    }
 
-    reference.parentPath.replaceWith(target)
+      reference.parentPath.replaceWith(target)
+    }
   }
 }
 
