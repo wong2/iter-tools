@@ -1,5 +1,5 @@
 const { createMacro } = require('babel-plugin-macros')
-const matches = require("./matches");
+const matches = require('./matches')
 
 const { ASYNC } = process.env
 
@@ -10,6 +10,7 @@ const { ASYNC } = process.env
  * a(function() {})
  * a(Symbol.iterator)
  * a(anyExpression)
+ * a; function fn() {}
  * a; for(const foo of iterable) {}
  *
  * When generating sync sources, the above would become:
@@ -17,6 +18,7 @@ const { ASYNC } = process.env
  * function() {}
  * Symbol.iterator
  * anyExpression
+ * function fn() {}
  * for(const foo of iterable) {}
  *
  * When generating async sources, you would get:
@@ -24,6 +26,7 @@ const { ASYNC } = process.env
  * async function() {}
  * Symbol.asyncIterator
  * await anyExpression
+ * async function fn() {}
  * for await(const foo of iterable) {}
  */
 
@@ -37,37 +40,45 @@ const symbolIteratorAst = {
   }
 }
 
+const functionDeclarationAst = {
+  type: 'FunctionDeclaration'
+}
+
 const functionExpressionAst = {
-  type: 'FunctionExpression',
+  type: 'FunctionExpression'
 }
 
 const loopStatementAst = {
-  type: 'ForOfStatement',
+  type: 'ForOfStatement'
 }
 
-function asyncMacro({ references, babel }) {
-  const t = babel.types;
+function asyncMacro ({ references, babel }) {
+  const t = babel.types
 
   for (const reference of references.default) {
     const { arguments: args, type: parentType } = reference.parent
 
-    if (parentType === "ExpressionStatement") {
-      const { container, node: parentNode } = reference.parentPath;
+    if (parentType === 'ExpressionStatement') {
+      const { container, node: parentNode } = reference.parentPath
       const loopIdx = container.findIndex(node => node === parentNode) + 1
       const nextStatement = container[loopIdx]
 
       if (matches(loopStatementAst, nextStatement)) {
         if (ASYNC) {
-          nextStatement.await = true;
+          nextStatement.await = true
+        }
+      } else if (matches(functionDeclarationAst, nextStatement)) {
+        if (ASYNC) {
+          nextStatement.async = true
         }
       }
 
       reference.remove()
 
-      continue;
-    } else if (parentType === "IfStatement") {
+      continue
+    } else if (parentType === 'IfStatement') {
       reference.replaceWith(t.booleanLiteral(!!ASYNC))
-      continue;
+      continue
     }
 
     if (args.length !== 1) {
@@ -82,14 +93,14 @@ function asyncMacro({ references, babel }) {
       }
     } else if (matches(functionExpressionAst, target)) {
       if (ASYNC) {
-        target.async = true;
+        target.async = true
       }
 
       target.type = 'FunctionDeclaration'
 
       reference.parentPath.parentPath.replaceWith(target)
 
-      continue;
+      continue
     } else {
       if (ASYNC) {
         target = t.awaitExpression(target)

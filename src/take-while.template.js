@@ -2,7 +2,7 @@ import a from './macros/a.macro'
 
 import { curry } from './internal/a-iterable'
 
-a(function * takeWhile (func, i) {
+a; function * takeWhile (func, i) {
   let take = true
   let c = 0
 
@@ -14,6 +14,6 @@ a(function * takeWhile (func, i) {
       break
     }
   }
-})
+}
 
 export default curry(takeWhile)

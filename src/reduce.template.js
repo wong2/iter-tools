@@ -2,7 +2,7 @@ import a from './macros/a.macro'
 
 import { curry } from './internal/a-iterable'
 
-a(function reduce (initial, func, iterable) {
+a; function reduce (initial, func, iterable) {
   let c = 0
   let acc = initial
   const iterator = iterable[a(Symbol.iterator)]()
@@ -23,6 +23,6 @@ a(function reduce (initial, func, iterable) {
   } finally { // close the iterable in case of exceptions
     if (typeof iterable.return === 'function') a(iterable.return())
   }
-})
+}
 
 export default curry(reduce, { variadic: false, reduces: true, minArgs: 1, maxArgs: 2 })
