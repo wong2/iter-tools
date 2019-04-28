@@ -1,4 +1,4 @@
-import a from './macros/a.macro'
+import a from './macros/sync-to-async.macro'
 
 import { curry } from './internal/a-iterable'
 

@@ -1,12 +1,14 @@
+const { ASYNC } = process.env
+
 function makeProject (projectConfig) {
-  return Object.assign({}, {
-    displayName: projectConfig.name,
+  return Object.assign({
     moduleFileExtensions: ['js', 'mjs'],
     setupFilesAfterEnv: ['./src/__tests__/__framework__/init-framework.js'],
     transform: {
       '.*': '<rootDir>/transformers/' + projectConfig.name
     },
-    testMatch: ['**/__tests__/**/*.test.js']
+    displayName: projectConfig.name + (ASYNC ? '-async' : '-sync'),
+    testRegex: ASYNC ? '/__tests__/a-.*\\.test\\.js$' : '/__tests__/.*\\.test\\.js$',
   }, projectConfig)
 }
 
@@ -20,12 +22,11 @@ module.exports = {
     }),
     makeProject({
       name: 'es2015'
-    })
-  ].concat(
-    process.env.CI
-      ? makeProject({
+    }),
+    ...(process.env.CI
+      ? [makeProject({
         name: 'es2018'
-      })
-      : []
-  )
+      })]
+      : [])
+  ]
 }

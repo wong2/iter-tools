@@ -8,7 +8,8 @@
   "typings": "es5/index.d.ts",
   "scripts": {
     "lint": "eslint --fix --ext .mjs,.js ./src ./src/__tests__ ./benchmarks && npm run tslint",
-    "test:js": "jest",
+    "test:js:sync": "jest",
+    "test:js:async": "cross-env ASYNC=true jest",
     "test:types": "tsc",
     "test": "run-s test:*",
     "benchmarks": "npm run clean && npm run build:es2018-cjs && node benchmarks",
